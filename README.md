@@ -146,7 +146,7 @@ rusty_journal/
 
 **Editor doesn't open?**
 - Set the `EDITOR` or `VISUAL` environment variable
-- The tool will try vim, nano, or vi as fallbacks
+- The tool will try vscode, vim, nano, or vi as fallbacks
 
 **Entries not showing in mdbook?**
 - Make sure you've run `journal init` first
