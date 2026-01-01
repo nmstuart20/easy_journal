@@ -155,7 +155,3 @@ rusty_journal/
 ## License
 
 MIT License - feel free to use this project for your personal journaling needs.
-
----
-
-Happy journaling! 📝
