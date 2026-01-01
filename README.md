@@ -2,16 +2,6 @@
 
 A an over-engineered command-line journal system that uses Rust mdbook. Create, organize, and browse your daily journal entries.
 
-## Features
-
-- **Automated Entry Creation**: Create daily journal entries with a single command
-- **Hierarchical Organization**: Automatic year/month/day folder structure
-- **Smart Navigation**: Auto-generated table of contents with reverse chronological ordering
-- **Customizable Templates**: Personalize your daily entry format with template variables
-- **Beautiful Rendering**: View your journal as a searchable, navigable book using mdbook
-- **Editor Integration**: Opens entries in your preferred editor automatically
-- **Date Flexibility**: Create entries for any date, not just today
-
 ## Quick Start
 
 ### Prerequisites
@@ -27,8 +17,11 @@ A an over-engineered command-line journal system that uses Rust mdbook. Create, 
    ```bash
    cargo install --path .
    ```
-
-2. Create a directory for your journal and initialize:
+2. Install mdbook
+   ```bash
+   cargo install mdbook
+   ```
+3. Create a directory for your journal and initialize:
    ```bash
    mkdir my-journal
    cd my-journal
@@ -39,19 +32,6 @@ The `init` command automatically creates everything you need:
 - `book.toml` - mdbook configuration
 - `journal/` directory with README.md and SUMMARY.md
 - `template.md` - customizable daily entry template
-
-**Option 2: Development/Contributing**
-
-1. Clone this repository:
-   ```bash
-   git clone https://github.com/yourusername/rusty_journal.git
-   cd rusty_journal
-   ```
-
-2. Install the CLI:
-   ```bash
-   cargo install --path .
-   ```
 
 ### Usage
 
