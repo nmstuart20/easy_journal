@@ -57,9 +57,6 @@ Browse your entries by year and month using the sidebar navigation.
 
 Edit the `template.md` file in the project root to customize your daily entry template.
 
----
-
-Happy journaling!
 "#;
         fs::write(&readme_path, readme_content)?;
         println!("✓ Created README.md");
