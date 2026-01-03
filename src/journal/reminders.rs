@@ -6,14 +6,15 @@ use crate::error::{JournalError, Result};
 
 const APPLESCRIPT_GET_REMINDERS: &str = r#"
 tell application "Reminders"
-    set output to ""
-    set allLists to lists
-    repeat with aList in allLists
-        set listReminders to (reminders of aList whose completed is false)
-        repeat with aReminder in listReminders
-            set output to output & (name of aReminder) & linefeed
-        end repeat
-    end repeat
+    -- 1. Fetch all names in a single IPC call using a 'whose' filter
+    -- This returns a list of lists: {{"Task A", "Task B"}, {"Task C"}, {}}
+    set nestedNames to name of (reminders of every list whose completed is false)
+    
+    -- 2. Flatten and join the lists using AppleScript's text delimiters
+    set {oldTID, AppleScript's text item delimiters} to {AppleScript's text item delimiters, linefeed}
+    set output to nestedNames as text
+    set AppleScript's text item delimiters to oldTID
+    
     return output
 end tell
 "#;
