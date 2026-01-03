@@ -210,6 +210,53 @@ async fn serve_index() -> Html<String> {
             display: block;
         }
 
+        /* Loading modal styles */
+        .loading-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .loading-modal.show {
+            display: flex;
+        }
+
+        .loading-content {
+            background: white;
+            padding: 40px;
+            border-radius: 16px;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            color: #333;
+            font-size: 16px;
+            font-weight: 500;
+        }
+
         @media (max-width: 600px) {
             .container {
                 padding: 20px;
@@ -246,6 +293,14 @@ async fn serve_index() -> Html<String> {
         <div id="message" class="message"></div>
     </div>
 
+    <!-- Loading modal -->
+    <div id="loadingModal" class="loading-modal">
+        <div class="loading-content">
+            <div class="spinner"></div>
+            <div class="loading-text">Fetching Apple Reminders...</div>
+        </div>
+    </div>
+
     <script>
         // Set today's date by default
         const dateInput = document.getElementById('date');
@@ -267,8 +322,19 @@ async fn serve_index() -> Html<String> {
             }, 5000);
         }
 
+        function showLoading() {
+            document.getElementById('loadingModal').classList.add('show');
+        }
+
+        function hideLoading() {
+            document.getElementById('loadingModal').classList.remove('show');
+        }
+
         async function loadEntry() {
             const date = dateInput.value;
+
+            // Show loading modal
+            showLoading();
 
             try {
                 const response = await fetch(`/api/entry?date=${date}`);
@@ -286,6 +352,9 @@ async fn serve_index() -> Html<String> {
                 }
             } catch (error) {
                 showMessage(`Failed to load entry: ${error.message}`, 'error');
+            } finally {
+                // Always hide loading modal
+                hideLoading();
             }
         }
 
