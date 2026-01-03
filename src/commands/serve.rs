@@ -374,9 +374,19 @@ async fn get_entry(
         match crate::journal::template::load_template(&state.config.template_path) {
             Ok(template) => {
                 // Get previous content for carrying over tasks
-                let previous_content = JournalEntry::get_previous_content(date, &state.config).unwrap_or_default();
+                let previous_content =
+                    JournalEntry::get_previous_content(date, &state.config).unwrap_or_default();
 
-                crate::journal::template::apply_variables(&template, date, previous_content)
+                // Fetch Apple Reminders
+                let apple_reminders =
+                    crate::journal::reminders::fetch_apple_reminders().unwrap_or(None);
+
+                crate::journal::template::apply_variables(
+                    &template,
+                    date,
+                    previous_content,
+                    apple_reminders,
+                )
             }
             Err(e) => {
                 return (

@@ -6,6 +6,9 @@ use crate::error::{JournalError, Result};
 
 const DEFAULT_TEMPLATE: &str = r#"# {{date}} - {{day_of_week}}
 
+## Reminders
+{{reminders}}
+
 ## Goals for Today
 - [ ]
 - [ ]
@@ -53,6 +56,7 @@ pub fn apply_variables(
     template: &str,
     date: NaiveDate,
     previous_content: Option<String>,
+    reminders: Option<String>,
 ) -> String {
     let date_str = date.format("%Y-%m-%d").to_string();
     let day_of_week = date.format("%A").to_string();
@@ -61,13 +65,16 @@ pub fn apply_variables(
     let month_num = date.format("%m").to_string();
     let day = date.format("%d").to_string();
 
+    let reminders_content = reminders.unwrap_or_else(|| String::new());
+
     let mut result = template
         .replace("{{date}}", &date_str)
         .replace("{{day_of_week}}", &day_of_week)
         .replace("{{year}}", &year)
         .replace("{{month}}", &month)
         .replace("{{month_num}}", &month_num)
-        .replace("{{day}}", &day);
+        .replace("{{day}}", &day)
+        .replace("{{reminders}}", &reminders_content);
 
     // If we have previous content, inject it into "Goals for Today"
     if let Some(content) = previous_content {
@@ -155,7 +162,7 @@ mod tests {
     fn test_apply_variables() {
         let template = "# {{date}} - {{day_of_week}}\nYear: {{year}}, Month: {{month}}";
         let date = NaiveDate::from_ymd_opt(2025, 12, 29).unwrap();
-        let result = apply_variables(template, date, None);
+        let result = apply_variables(template, date, None, None);
 
         assert!(result.contains("2025-12-29"));
         assert!(result.contains("Monday"));
@@ -179,6 +186,18 @@ mod tests {
 
         assert!(result.contains("- [ ] Complete feature X"));
         assert!(result.contains("- [ ] Review documentation"));
+    }
+
+    #[test]
+    fn test_reminders_variable() {
+        let template = "## Reminders\n{{reminders}}\n## Goals";
+        let date = NaiveDate::from_ymd_opt(2025, 12, 29).unwrap();
+        let reminders = Some("- [ ] Buy milk\n- [ ] Call dentist".to_string());
+        let result = apply_variables(template, date, None, reminders);
+
+        assert!(result.contains("- [ ] Buy milk"));
+        assert!(result.contains("- [ ] Call dentist"));
+        assert!(!result.contains("{{reminders}}"));
     }
 
     #[test]

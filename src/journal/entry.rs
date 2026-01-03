@@ -4,7 +4,7 @@ use std::path::PathBuf;
 
 use crate::config::Config;
 use crate::error::Result;
-use crate::journal::{filesystem, parser, summary, template};
+use crate::journal::{filesystem, parser, reminders, summary, template};
 
 pub struct JournalEntry {
     pub date: NaiveDate,
@@ -31,7 +31,15 @@ impl JournalEntry {
             // Get previous entry's unchecked tasks and "Tomorrow's Focus" content
             let previous_content = Self::get_previous_content(date, config)?;
 
-            let content = template::apply_variables(&template_content, date, previous_content);
+            // Fetch Apple Reminders
+            let apple_reminders = reminders::fetch_apple_reminders().unwrap_or(None);
+
+            let content = template::apply_variables(
+                &template_content,
+                date,
+                previous_content,
+                apple_reminders,
+            );
             fs::write(&entry_path, content)?;
 
             // Update SUMMARY.md

@@ -20,6 +20,9 @@ pub enum JournalError {
 
     #[error("Invalid configuration: {0}")]
     _InvalidConfig(String),
+
+    #[error("Failed to fetch reminders: {0}")]
+    RemindersFailed(String),
 }
 
 pub type Result<T> = std::result::Result<T, JournalError>;
