@@ -1,5 +1,6 @@
 use std::path::PathBuf;
 
+#[derive(Clone)]
 pub struct Config {
     pub journal_dir: PathBuf,
     pub template_path: PathBuf,

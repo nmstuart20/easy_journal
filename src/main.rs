@@ -26,9 +26,12 @@ enum Commands {
     },
     /// Initialize journal structure
     Init,
+    /// Start web server for mobile access
+    Serve,
 }
 
-fn main() -> Result<()> {
+#[tokio::main]
+async fn main() -> Result<()> {
     let cli = Cli::parse();
     let config = Config::new();
 
@@ -38,6 +41,9 @@ fn main() -> Result<()> {
         }
         Some(Commands::Init) => {
             commands::init::run(&config)?;
+        }
+        Some(Commands::Serve) => {
+            commands::serve::run(&config).await?;
         }
         None => {
             // Default behavior: create today's entry
