@@ -374,11 +374,7 @@ async fn get_entry(
         match crate::journal::template::load_template(&state.config.template_path) {
             Ok(template) => {
                 // Get previous content for carrying over tasks
-                let previous_content = match JournalEntry::get_previous_content(date, &state.config)
-                {
-                    Ok(content) => content,
-                    Err(_) => None,
-                };
+                let previous_content = JournalEntry::get_previous_content(date, &state.config).unwrap_or_default();
 
                 crate::journal::template::apply_variables(&template, date, previous_content)
             }
