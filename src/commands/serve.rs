@@ -370,25 +370,23 @@ async fn get_entry(
             }
         }
     } else {
-        // Create entry using existing logic to get the template
-        match JournalEntry::create(date, &state.config) {
-            Ok(entry) => match fs::read_to_string(&entry.file_path) {
-                Ok(c) => c,
-                Err(e) => {
-                    return (
-                        StatusCode::INTERNAL_SERVER_ERROR,
-                        Json(ErrorResponse {
-                            error: format!("Failed to read new entry: {}", e),
-                        }),
-                    )
-                        .into_response();
-                }
-            },
+        // Generate template preview without creating the file
+        match crate::journal::template::load_template(&state.config.template_path) {
+            Ok(template) => {
+                // Get previous content for carrying over tasks
+                let previous_content = match JournalEntry::get_previous_content(date, &state.config)
+                {
+                    Ok(content) => content,
+                    Err(_) => None,
+                };
+
+                crate::journal::template::apply_variables(&template, date, previous_content)
+            }
             Err(e) => {
                 return (
                     StatusCode::INTERNAL_SERVER_ERROR,
                     Json(ErrorResponse {
-                        error: format!("Failed to create entry: {}", e),
+                        error: format!("Failed to load template: {}", e),
                     }),
                 )
                     .into_response();
