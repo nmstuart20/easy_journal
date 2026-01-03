@@ -65,7 +65,7 @@ pub fn apply_variables(
     let month_num = date.format("%m").to_string();
     let day = date.format("%d").to_string();
 
-    let reminders_content = reminders.unwrap_or_else(|| String::new());
+    let reminders_content = reminders.unwrap_or_default();
 
     let mut result = template
         .replace("{{date}}", &date_str)
