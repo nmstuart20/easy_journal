@@ -79,6 +79,9 @@ Edit the `template.md` file in the project root to customize your daily entry te
     if !config.template_path.exists() {
         let template_content = r#"# {{date}} - {{day_of_week}}
 
+## Reminders
+{{reminders}}
+
 ## Goals for Today
 - [ ]
 - [ ]

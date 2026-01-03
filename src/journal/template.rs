@@ -66,7 +66,7 @@ pub fn apply_variables(
     let day = date.format("%d").to_string();
 
     let reminders_content = reminders.unwrap_or_default();
-
+    
     let mut result = template
         .replace("{{date}}", &date_str)
         .replace("{{day_of_week}}", &day_of_week)
