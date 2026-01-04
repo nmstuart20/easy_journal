@@ -30,7 +30,7 @@ fn fetch_reminders_applescript() -> Result<Vec<String>> {
 
     // Spawn the process instead of using .output() to allow for timeout
     let mut child = Command::new("osascript")
-        .arg("-")  // Read script from stdin
+        .arg("-") // Read script from stdin
         .stdin(Stdio::piped())
         .stdout(Stdio::piped())
         .stderr(Stdio::piped())
@@ -42,9 +42,14 @@ fn fetch_reminders_applescript() -> Result<Vec<String>> {
     // Write the AppleScript to stdin
     if let Some(mut stdin) = child.stdin.take() {
         use std::io::Write;
-        stdin.write_all(APPLESCRIPT_GET_REMINDERS.as_bytes()).map_err(|e| {
-            JournalError::RemindersFailed(format!("Failed to write AppleScript to stdin: {}", e))
-        })?;
+        stdin
+            .write_all(APPLESCRIPT_GET_REMINDERS.as_bytes())
+            .map_err(|e| {
+                JournalError::RemindersFailed(format!(
+                    "Failed to write AppleScript to stdin: {}",
+                    e
+                ))
+            })?;
     }
 
     // Wait for the process with a timeout (5 seconds)
@@ -99,7 +104,7 @@ fn fetch_reminders_applescript() -> Result<Vec<String>> {
                 return Err(JournalError::RemindersFailed(format!(
                     "Error waiting for AppleScript: {}",
                     e
-                )))
+                )));
             }
         }
     }
