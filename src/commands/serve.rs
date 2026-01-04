@@ -297,7 +297,7 @@ async fn serve_index() -> Html<String> {
     <div id="loadingModal" class="loading-modal">
         <div class="loading-content">
             <div class="spinner"></div>
-            <div class="loading-text">Fetching Apple Reminders...</div>
+            <div class="loading-text">Fetching Reminders...</div>
         </div>
     </div>
 
@@ -446,15 +446,16 @@ async fn get_entry(
                 let previous_content =
                     JournalEntry::get_previous_content(date, &state.config).unwrap_or_default();
 
-                // Fetch Apple Reminders
-                let apple_reminders =
-                    crate::journal::reminders::fetch_apple_reminders().unwrap_or(None);
+                // Fetch all reminders (Apple + Google) concurrently
+                let all_reminders = crate::journal::reminders::merge_all_reminders(&state.config)
+                    .await
+                    .unwrap_or(None);
 
                 crate::journal::template::apply_variables(
                     &template,
                     date,
                     previous_content,
-                    apple_reminders,
+                    all_reminders,
                 )
             }
             Err(e) => {

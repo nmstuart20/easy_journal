@@ -28,6 +28,11 @@ enum Commands {
     Init,
     /// Start web server for mobile access
     Serve,
+    /// Authenticate with Google Tasks
+    Auth {
+        /// Provider (currently only "google")
+        provider: String,
+    },
 }
 
 #[tokio::main]
@@ -37,7 +42,7 @@ async fn main() -> Result<()> {
 
     match cli.command {
         Some(Commands::New { date }) => {
-            commands::new::run(date, &config)?;
+            commands::new::run(date, &config).await?;
         }
         Some(Commands::Init) => {
             commands::init::run(&config)?;
@@ -45,9 +50,17 @@ async fn main() -> Result<()> {
         Some(Commands::Serve) => {
             commands::serve::run(&config).await?;
         }
+        Some(Commands::Auth { provider }) => {
+            if provider.to_lowercase() == "google" {
+                commands::auth::run(&config).await?;
+            } else {
+                eprintln!("Unknown provider: {}. Use 'google'.", provider);
+                std::process::exit(1);
+            }
+        }
         None => {
             // Default behavior: create today's entry
-            commands::new::run(None, &config)?;
+            commands::new::run(None, &config).await?;
         }
     }
 

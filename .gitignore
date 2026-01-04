@@ -1,1 +1,4 @@
 /target
+.easy_journal_tokens.json
+.env
+credentials.json

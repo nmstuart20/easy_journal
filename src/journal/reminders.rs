@@ -1,7 +1,9 @@
 use std::env;
 use std::process::{Command, Stdio};
 use std::time::Duration;
+use tokio::task;
 
+use crate::config::Config;
 use crate::error::{JournalError, Result};
 
 const APPLESCRIPT_GET_REMINDERS: &str = r#"
@@ -131,6 +133,54 @@ pub fn fetch_apple_reminders() -> Result<Option<String>> {
             eprintln!("Warning: Could not fetch Apple Reminders: {}", e);
             Ok(None)
         }
+    }
+}
+
+/// Fetch Apple Reminders asynchronously (wraps blocking code)
+pub async fn fetch_apple_reminders_async() -> Result<Option<String>> {
+    // Run blocking Apple Reminders fetch in separate thread pool
+    task::spawn_blocking(|| fetch_apple_reminders())
+        .await
+        .map_err(|e| JournalError::RemindersFailed(format!("Task join error: {}", e)))?
+}
+
+/// Fetch and merge Apple Reminders + Google Tasks
+pub async fn merge_all_reminders(config: &Config) -> Result<Option<String>> {
+    // Fetch both sources concurrently
+    let apple_task = fetch_apple_reminders_async();
+    let google_task = crate::journal::google_tasks::fetch_google_tasks(&config.google_oauth);
+
+    let (apple_result, google_result) = tokio::join!(apple_task, google_task);
+
+    // Handle Apple Reminders (non-blocking on error)
+    let apple_reminders = match apple_result {
+        Ok(Some(reminders)) => Some(reminders),
+        Ok(None) => None,
+        Err(e) => {
+            eprintln!("Warning: Could not fetch Apple Reminders: {}", e);
+            None
+        }
+    };
+
+    // Handle Google Tasks (non-blocking on error)
+    let google_tasks = match google_result {
+        Ok(Some(tasks)) => Some(tasks),
+        Ok(None) => None,
+        Err(e) => {
+            eprintln!("Warning: Could not fetch Google Tasks: {}", e);
+            None
+        }
+    };
+
+    // Merge results
+    match (apple_reminders, google_tasks) {
+        (Some(apple), Some(google)) => Ok(Some(format!(
+            "### Apple Reminders\n{}\n\n### Google Tasks\n{}",
+            apple, google
+        ))),
+        (Some(apple), None) => Ok(Some(format!("### Apple Reminders\n{}", apple))),
+        (None, Some(google)) => Ok(Some(format!("### Google Tasks\n{}", google))),
+        (None, None) => Ok(None),
     }
 }
 

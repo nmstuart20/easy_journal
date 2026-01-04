@@ -23,6 +23,15 @@ pub enum JournalError {
 
     #[error("Failed to fetch reminders: {0}")]
     RemindersFailed(String),
+
+    #[error("OAuth configuration missing: {0}")]
+    OAuthConfigMissing(String),
+
+    #[error("OAuth authentication failed: {0}")]
+    OAuthFailed(String),
+
+    #[error("Failed to fetch Google Tasks: {0}")]
+    GoogleTasksFailed(String),
 }
 
 pub type Result<T> = std::result::Result<T, JournalError>;

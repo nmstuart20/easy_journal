@@ -12,7 +12,7 @@ pub struct JournalEntry {
 }
 
 impl JournalEntry {
-    pub fn create(date: NaiveDate, config: &Config) -> Result<Self> {
+    pub async fn create(date: NaiveDate, config: &Config) -> Result<Self> {
         let year = date.format("%Y").to_string().parse::<u32>().unwrap();
         let month = date.format("%m").to_string().parse::<u32>().unwrap();
 
@@ -31,15 +31,11 @@ impl JournalEntry {
             // Get previous entry's unchecked tasks and "Tomorrow's Focus" content
             let previous_content = Self::get_previous_content(date, config)?;
 
-            // Fetch Apple Reminders
-            let apple_reminders = reminders::fetch_apple_reminders().unwrap_or(None);
+            // Fetch all reminders (Apple + Google) concurrently
+            let all_reminders = reminders::merge_all_reminders(config).await.unwrap_or(None);
 
-            let content = template::apply_variables(
-                &template_content,
-                date,
-                previous_content,
-                apple_reminders,
-            );
+            let content =
+                template::apply_variables(&template_content, date, previous_content, all_reminders);
             fs::write(&entry_path, content)?;
 
             // Update SUMMARY.md

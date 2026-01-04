@@ -6,7 +6,7 @@ use crate::config::Config;
 use crate::error::{JournalError, Result};
 use crate::journal::entry::JournalEntry;
 
-pub fn run(date_str: Option<String>, config: &Config) -> Result<()> {
+pub async fn run(date_str: Option<String>, config: &Config) -> Result<()> {
     // Determine the date
     let date = if let Some(date_str) = date_str {
         NaiveDate::parse_from_str(&date_str, "%Y-%m-%d")
@@ -16,7 +16,7 @@ pub fn run(date_str: Option<String>, config: &Config) -> Result<()> {
     };
 
     // Create or get existing entry
-    let entry = JournalEntry::create(date, config)?;
+    let entry = JournalEntry::create(date, config).await?;
 
     let exists_msg = if JournalEntry::exists(date, config) {
         "Opening existing entry"
