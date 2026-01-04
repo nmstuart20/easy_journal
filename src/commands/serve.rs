@@ -73,6 +73,7 @@ async fn serve_index() -> Html<String> {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Journal Entry</title>
+    <script src="https://cdn.jsdelivr.net/npm/marked@11.1.1/marked.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -88,12 +89,106 @@ async fn serve_index() -> Html<String> {
         }
 
         .container {
-            max-width: 800px;
+            max-width: 1400px;
             margin: 0 auto;
             background: white;
             border-radius: 20px;
             padding: 30px;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .editor-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .editor-pane, .preview-pane {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .pane-header {
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .preview-content {
+            width: 100%;
+            min-height: 400px;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            background: #fafafa;
+            overflow-y: auto;
+            line-height: 1.6;
+        }
+
+        .preview-content h1 {
+            font-size: 24px;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+
+        .preview-content h2 {
+            font-size: 20px;
+            margin-top: 16px;
+            margin-bottom: 8px;
+        }
+
+        .preview-content h3 {
+            font-size: 18px;
+            margin-top: 14px;
+            margin-bottom: 6px;
+        }
+
+        .preview-content p {
+            margin-bottom: 12px;
+        }
+
+        .preview-content ul, .preview-content ol {
+            margin-left: 20px;
+            margin-bottom: 12px;
+        }
+
+        .preview-content li {
+            margin-bottom: 4px;
+        }
+
+        .preview-content code {
+            background: #f0f0f0;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+
+        .preview-content pre {
+            background: #f0f0f0;
+            padding: 12px;
+            border-radius: 6px;
+            overflow-x: auto;
+            margin-bottom: 12px;
+        }
+
+        .preview-content pre code {
+            background: none;
+            padding: 0;
+        }
+
+        .preview-content blockquote {
+            border-left: 4px solid #667eea;
+            padding-left: 16px;
+            margin-left: 0;
+            margin-bottom: 12px;
+            color: #666;
+        }
+
+        .preview-content input[type="checkbox"] {
+            margin-right: 8px;
         }
 
         h1 {
@@ -257,6 +352,16 @@ async fn serve_index() -> Html<String> {
             font-weight: 500;
         }
 
+        @media (max-width: 900px) {
+            .editor-container {
+                grid-template-columns: 1fr;
+            }
+
+            .preview-pane {
+                order: -1;
+            }
+        }
+
         @media (max-width: 600px) {
             .container {
                 padding: 20px;
@@ -282,8 +387,16 @@ async fn serve_index() -> Html<String> {
             <input type="date" id="date" value="">
         </div>
 
-        <label for="content">Entry Content:</label>
-        <textarea id="content" placeholder="Write your journal entry here..."></textarea>
+        <div class="editor-container">
+            <div class="editor-pane">
+                <label for="content" class="pane-header">Editor</label>
+                <textarea id="content" placeholder="Write your journal entry here..."></textarea>
+            </div>
+            <div class="preview-pane">
+                <div class="pane-header">Preview</div>
+                <div id="preview" class="preview-content"></div>
+            </div>
+        </div>
 
         <div class="button-group">
             <button class="btn-secondary" onclick="loadEntry()">Load Entry</button>
@@ -304,8 +417,19 @@ async fn serve_index() -> Html<String> {
     <script>
         // Set today's date by default
         const dateInput = document.getElementById('date');
+        const contentTextarea = document.getElementById('content');
+        const previewDiv = document.getElementById('preview');
         const today = new Date().toISOString().split('T')[0];
         dateInput.value = today;
+
+        // Update preview when content changes
+        function updatePreview() {
+            const markdown = contentTextarea.value;
+            previewDiv.innerHTML = marked.parse(markdown);
+        }
+
+        // Add input event listener for live preview
+        contentTextarea.addEventListener('input', updatePreview);
 
         // Load entry on page load
         window.onload = () => loadEntry();
@@ -341,7 +465,8 @@ async fn serve_index() -> Html<String> {
                 const data = await response.json();
 
                 if (response.ok) {
-                    document.getElementById('content').value = data.content;
+                    contentTextarea.value = data.content;
+                    updatePreview();
                     if (data.exists) {
                         showMessage('Entry loaded successfully', 'success');
                     } else {
@@ -360,7 +485,7 @@ async fn serve_index() -> Html<String> {
 
         async function saveEntry() {
             const date = dateInput.value;
-            const content = document.getElementById('content').value;
+            const content = contentTextarea.value;
 
             if (!content.trim()) {
                 showMessage('Please write something before saving', 'error');
