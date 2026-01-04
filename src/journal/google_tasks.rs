@@ -74,16 +74,17 @@ pub async fn fetch_google_tasks(oauth_config: &GoogleOAuthConfig) -> Result<Opti
                     .await;
 
                 if let Ok((_, tasks_response)) = tasks_result
-                    && let Some(tasks) = tasks_response.items {
-                        for task in tasks {
-                            if let Some(title) = task.title {
-                                // Only add tasks with non-empty titles
-                                if !title.trim().is_empty() {
-                                    all_tasks.push(title);
-                                }
+                    && let Some(tasks) = tasks_response.items
+                {
+                    for task in tasks {
+                        if let Some(title) = task.title {
+                            // Only add tasks with non-empty titles
+                            if !title.trim().is_empty() {
+                                all_tasks.push(title);
                             }
                         }
                     }
+                }
             }
         }
     }
