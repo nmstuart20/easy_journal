@@ -49,12 +49,19 @@ journal new
 journal new --date 2025-12-29
 ```
 
-#### View Your Journal
+#### View Your Journal (with mdbook)
 ```bash
 mdbook serve --open
 ```
 
 This will build and serve your journal at `http://localhost:3000` with live-reload.
+
+#### View And Edit Your Journal (with axum)
+```bash
+journal serve
+```
+
+This will build and serve your journal at `http://0.0.0.0:3030` with live-reload.
 
 ## Template Customization
 
