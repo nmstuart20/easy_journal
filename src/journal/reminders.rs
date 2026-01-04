@@ -139,7 +139,7 @@ pub fn fetch_apple_reminders() -> Result<Option<String>> {
 /// Fetch Apple Reminders asynchronously (wraps blocking code)
 pub async fn fetch_apple_reminders_async() -> Result<Option<String>> {
     // Run blocking Apple Reminders fetch in separate thread pool
-    task::spawn_blocking(|| fetch_apple_reminders())
+    task::spawn_blocking(fetch_apple_reminders)
         .await
         .map_err(|e| JournalError::RemindersFailed(format!("Task join error: {}", e)))?
 }
