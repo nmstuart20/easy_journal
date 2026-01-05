@@ -9,8 +9,7 @@ use config::Config;
 use error::Result;
 
 #[derive(Parser)]
-#[command(name = "journal")]
-#[command(about = "Manage daily journal entries with mdbook", long_about = None)]
+#[command(version, about = "Manage daily journal entries with mdbook", long_about = None)]
 struct Cli {
     #[command(subcommand)]
     command: Option<Commands>,

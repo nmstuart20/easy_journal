@@ -25,7 +25,7 @@ A an over-engineered command-line journal system that uses Rust mdbook. Create, 
    ```bash
    mkdir my-journal
    cd my-journal
-   journal init
+   easy_journal init
    ```
 
 The `init` command automatically creates everything you need:
@@ -37,16 +37,16 @@ The `init` command automatically creates everything you need:
 
 #### Create Today's Entry
 ```bash
-journal
+easy_journal
 ```
 or
 ```bash
-journal new
+easy_journal new
 ```
 
 #### Create Entry for Specific Date
 ```bash
-journal new --date 2025-12-29
+easy_journal new --date 2025-12-29
 ```
 
 #### View Your Journal (with mdbook)
@@ -58,7 +58,7 @@ This will build and serve your journal at `http://localhost:3000` with live-relo
 
 #### View And Edit Your Journal (with axum)
 ```bash
-journal serve
+easy_journal serve
 ```
 
 This will build and serve your journal at `http://0.0.0.0:3030` with live-reload.
