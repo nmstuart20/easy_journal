@@ -35,8 +35,7 @@ impl JournalEntry {
             let reminders_task = reminders::merge_all_reminders(config);
             let git_integrations_task = git_integrations::merge_git_integrations(config);
 
-            let (all_reminders, git_items) =
-                tokio::join!(reminders_task, git_integrations_task);
+            let (all_reminders, git_items) = tokio::join!(reminders_task, git_integrations_task);
 
             let all_reminders = all_reminders.unwrap_or(None);
             let git_items = git_items.unwrap_or(None);

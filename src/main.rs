@@ -48,7 +48,11 @@ async fn main() -> Result<()> {
     let mut config = Config::new();
 
     match cli.command {
-        Some(Commands::New { date, github, gitlab }) => {
+        Some(Commands::New {
+            date,
+            github,
+            gitlab,
+        }) => {
             config.github_config.enabled = github;
             config.gitlab_config.enabled = gitlab;
             commands::new::run(date, &config).await?;

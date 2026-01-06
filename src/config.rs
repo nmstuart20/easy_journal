@@ -49,8 +49,7 @@ impl Default for Config {
             },
             gitlab_config: GitLabConfig {
                 token: env::var("GITLAB_TOKEN").ok(),
-                host: env::var("GITLAB_HOST")
-                    .unwrap_or_else(|_| "https://gitlab.com".to_string()),
+                host: env::var("GITLAB_HOST").unwrap_or_else(|_| "https://gitlab.com".to_string()),
                 enabled: false,
             },
         }

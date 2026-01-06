@@ -55,8 +55,7 @@ pub async fn fetch_github_items(config: &GitHubConfig) -> Result<Option<String>>
 
     let token = config.token.as_ref().ok_or_else(|| {
         JournalError::GitHubFailed(
-            "GITHUB_TOKEN not set. Set the environment variable and use --github flag."
-                .to_string(),
+            "GITHUB_TOKEN not set. Set the environment variable and use --github flag.".to_string(),
         )
     })?;
 
@@ -70,12 +69,16 @@ pub async fn fetch_github_items(config: &GitHubConfig) -> Result<Option<String>>
     let token_clone1 = token.clone();
     let client_clone1 = client.clone();
     let assigned_issues_task =
-        tokio::task::spawn(async move { fetch_assigned_issues(&client_clone1, &token_clone1).await });
+        tokio::task::spawn(
+            async move { fetch_assigned_issues(&client_clone1, &token_clone1).await },
+        );
 
     let token_clone2 = token.clone();
     let client_clone2 = client.clone();
     let created_issues_task =
-        tokio::task::spawn(async move { fetch_created_issues(&client_clone2, &token_clone2).await });
+        tokio::task::spawn(
+            async move { fetch_created_issues(&client_clone2, &token_clone2).await },
+        );
 
     let token_clone3 = token.clone();
     let client_clone3 = client.clone();
@@ -85,7 +88,9 @@ pub async fn fetch_github_items(config: &GitHubConfig) -> Result<Option<String>>
     let token_clone4 = token.clone();
     let client_clone4 = client.clone();
     let review_requests_task =
-        tokio::task::spawn(async move { fetch_review_requests(&client_clone4, &token_clone4).await });
+        tokio::task::spawn(
+            async move { fetch_review_requests(&client_clone4, &token_clone4).await },
+        );
 
     let (assigned_issues, created_issues, assigned_prs, review_requests) = tokio::join!(
         assigned_issues_task,
@@ -99,8 +104,8 @@ pub async fn fetch_github_items(config: &GitHubConfig) -> Result<Option<String>>
         .map_err(|e| JournalError::GitHubFailed(format!("Task join error: {}", e)))?;
     let created_issues = created_issues
         .map_err(|e| JournalError::GitHubFailed(format!("Task join error: {}", e)))?;
-    let assigned_prs = assigned_prs
-        .map_err(|e| JournalError::GitHubFailed(format!("Task join error: {}", e)))?;
+    let assigned_prs =
+        assigned_prs.map_err(|e| JournalError::GitHubFailed(format!("Task join error: {}", e)))?;
     let review_requests = review_requests
         .map_err(|e| JournalError::GitHubFailed(format!("Task join error: {}", e)))?;
 
@@ -127,20 +132,23 @@ pub async fn fetch_github_items(config: &GitHubConfig) -> Result<Option<String>>
     }
 }
 
-async fn fetch_assigned_issues(
-    client: &reqwest::Client,
-    token: &str,
-) -> Result<Vec<GitHubItem>> {
+async fn fetch_assigned_issues(client: &reqwest::Client, token: &str) -> Result<Vec<GitHubItem>> {
     let url = "https://api.github.com/issues";
 
     let response = client
         .get(url)
         .header("Authorization", format!("Bearer {}", token))
         .header("Accept", "application/vnd.github+json")
-        .query(&[("filter", "assigned"), ("state", "open"), ("per_page", "100")])
+        .query(&[
+            ("filter", "assigned"),
+            ("state", "open"),
+            ("per_page", "100"),
+        ])
         .send()
         .await
-        .map_err(|e| JournalError::GitHubFailed(format!("Failed to fetch assigned issues: {}", e)))?;
+        .map_err(|e| {
+            JournalError::GitHubFailed(format!("Failed to fetch assigned issues: {}", e))
+        })?;
 
     let issues: Vec<GitHubApiIssue> = response.json().await.map_err(|e| {
         JournalError::GitHubFailed(format!("Failed to parse assigned issues: {}", e))
@@ -172,20 +180,23 @@ async fn fetch_assigned_issues(
     Ok(items)
 }
 
-async fn fetch_created_issues(
-    client: &reqwest::Client,
-    token: &str,
-) -> Result<Vec<GitHubItem>> {
+async fn fetch_created_issues(client: &reqwest::Client, token: &str) -> Result<Vec<GitHubItem>> {
     let url = "https://api.github.com/issues";
 
     let response = client
         .get(url)
         .header("Authorization", format!("Bearer {}", token))
         .header("Accept", "application/vnd.github+json")
-        .query(&[("filter", "created"), ("state", "open"), ("per_page", "100")])
+        .query(&[
+            ("filter", "created"),
+            ("state", "open"),
+            ("per_page", "100"),
+        ])
         .send()
         .await
-        .map_err(|e| JournalError::GitHubFailed(format!("Failed to fetch created issues: {}", e)))?;
+        .map_err(|e| {
+            JournalError::GitHubFailed(format!("Failed to fetch created issues: {}", e))
+        })?;
 
     let issues: Vec<GitHubApiIssue> = response.json().await.map_err(|e| {
         JournalError::GitHubFailed(format!("Failed to parse created issues: {}", e))
@@ -217,24 +228,26 @@ async fn fetch_created_issues(
     Ok(items)
 }
 
-async fn fetch_assigned_prs(
-    client: &reqwest::Client,
-    token: &str,
-) -> Result<Vec<GitHubItem>> {
+async fn fetch_assigned_prs(client: &reqwest::Client, token: &str) -> Result<Vec<GitHubItem>> {
     let url = "https://api.github.com/issues";
 
     let response = client
         .get(url)
         .header("Authorization", format!("Bearer {}", token))
         .header("Accept", "application/vnd.github+json")
-        .query(&[("filter", "assigned"), ("state", "open"), ("per_page", "100")])
+        .query(&[
+            ("filter", "assigned"),
+            ("state", "open"),
+            ("per_page", "100"),
+        ])
         .send()
         .await
         .map_err(|e| JournalError::GitHubFailed(format!("Failed to fetch assigned PRs: {}", e)))?;
 
-    let issues: Vec<GitHubApiIssue> = response.json().await.map_err(|e| {
-        JournalError::GitHubFailed(format!("Failed to parse assigned PRs: {}", e))
-    })?;
+    let issues: Vec<GitHubApiIssue> = response
+        .json()
+        .await
+        .map_err(|e| JournalError::GitHubFailed(format!("Failed to parse assigned PRs: {}", e)))?;
 
     let items = issues
         .into_iter()
@@ -262,10 +275,7 @@ async fn fetch_assigned_prs(
     Ok(items)
 }
 
-async fn fetch_review_requests(
-    client: &reqwest::Client,
-    token: &str,
-) -> Result<Vec<GitHubItem>> {
+async fn fetch_review_requests(client: &reqwest::Client, token: &str) -> Result<Vec<GitHubItem>> {
     let url = "https://api.github.com/search/issues";
     let query = "type:pr state:open review-requested:@me";
 

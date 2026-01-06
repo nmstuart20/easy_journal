@@ -46,8 +46,7 @@ pub async fn fetch_gitlab_items(config: &GitLabConfig) -> Result<Option<String>>
 
     let token = config.token.as_ref().ok_or_else(|| {
         JournalError::GitLabFailed(
-            "GITLAB_TOKEN not set. Set the environment variable and use --gitlab flag."
-                .to_string(),
+            "GITLAB_TOKEN not set. Set the environment variable and use --gitlab flag.".to_string(),
         )
     })?;
 
@@ -97,8 +96,8 @@ pub async fn fetch_gitlab_items(config: &GitLabConfig) -> Result<Option<String>>
         .map_err(|e| JournalError::GitLabFailed(format!("Task join error: {}", e)))?;
     let created_issues = created_issues
         .map_err(|e| JournalError::GitLabFailed(format!("Task join error: {}", e)))?;
-    let assigned_mrs = assigned_mrs
-        .map_err(|e| JournalError::GitLabFailed(format!("Task join error: {}", e)))?;
+    let assigned_mrs =
+        assigned_mrs.map_err(|e| JournalError::GitLabFailed(format!("Task join error: {}", e)))?;
     let review_requests = review_requests
         .map_err(|e| JournalError::GitLabFailed(format!("Task join error: {}", e)))?;
 
@@ -138,7 +137,9 @@ async fn fetch_assigned_issues(
         .query(&[("scope", "assigned_to_me"), ("state", "opened")])
         .send()
         .await
-        .map_err(|e| JournalError::GitLabFailed(format!("Failed to fetch assigned issues: {}", e)))?;
+        .map_err(|e| {
+            JournalError::GitLabFailed(format!("Failed to fetch assigned issues: {}", e))
+        })?;
 
     let issues: Vec<GitLabApiIssue> = response.json().await.map_err(|e| {
         JournalError::GitLabFailed(format!("Failed to parse assigned issues: {}", e))
@@ -176,7 +177,9 @@ async fn fetch_created_issues(
         .query(&[("scope", "created_by_me"), ("state", "opened")])
         .send()
         .await
-        .map_err(|e| JournalError::GitLabFailed(format!("Failed to fetch created issues: {}", e)))?;
+        .map_err(|e| {
+            JournalError::GitLabFailed(format!("Failed to fetch created issues: {}", e))
+        })?;
 
     let issues: Vec<GitLabApiIssue> = response.json().await.map_err(|e| {
         JournalError::GitLabFailed(format!("Failed to parse created issues: {}", e))
