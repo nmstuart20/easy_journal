@@ -36,17 +36,17 @@ This is your personal daily journal, managed with Rust and built with mdbook.
 
 ## Getting Started
 
-Use the `journal` command to create daily entries:
+Use the `easy_journal` command to create daily entries:
 
 ```bash
 # Create/open today's entry
-journal
+easy_journal
 
 # Create entry for specific date
-journal new --date 2025-12-29
+easy_journal new --date 2025-12-29
 
 # Initialize the journal structure
-journal init
+easy_journal init
 ```
 
 ## Navigation
@@ -128,7 +128,7 @@ Edit the `template.md` file in the project root to customize your daily entry te
 
     println!("\n🎉 Journal repository initialized successfully!");
     println!("\nNext steps:");
-    println!("  1. Run 'journal' to create your first entry");
+    println!("  1. Run 'easy_journal' to create your first entry");
     println!("  2. Run 'mdbook serve' to view your journal in a browser");
     println!("  3. Customize 'template.md' to personalize your daily entries");
 

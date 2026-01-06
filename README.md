@@ -113,7 +113,7 @@ rusty_journal/
 
 ## How It Works
 
-1. **Entry Creation**: When you run `journal`, it:
+1. **Entry Creation**: When you run `easy_journal`, it:
    - Creates year/month directories if needed
    - Generates month README files
    - Applies your template with date variables
@@ -136,7 +136,7 @@ rusty_journal/
 - The tool will try vscode, vim, nano, or vi as fallbacks
 
 **Entries not showing in mdbook?**
-- Make sure you've run `journal init` first
+- Make sure you've run `easy_journal init` first
 - Check that `book.toml` points to `src = "journal"`
 
 ## License

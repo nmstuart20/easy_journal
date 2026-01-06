@@ -49,21 +49,21 @@ cargo fmt
 ### Journal Commands (after installation)
 ```bash
 # Create today's entry
-journal
+easy_journal
 # or
-journal new
+easy_journal new
 
 # Create entry for specific date
-journal new --date 2025-12-29
+easy_journal new --date 2025-12-29
 
 # Initialize journal structure
-journal init
+easy_journal init
 
 # Start web server for mobile access (port 3030)
-journal serve
+easy_journal serve
 
 # Authenticate with Google Tasks
-journal auth google
+easy_journal auth google
 ```
 
 ## Architecture
