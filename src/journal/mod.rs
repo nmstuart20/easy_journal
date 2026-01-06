@@ -1,5 +1,8 @@
 pub mod entry;
 pub mod filesystem;
+pub mod git_integrations;
+pub mod github;
+pub mod gitlab;
 pub mod google_tasks;
 pub mod oauth;
 pub mod parser;

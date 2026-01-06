@@ -4,7 +4,7 @@ use std::path::PathBuf;
 
 use crate::config::Config;
 use crate::error::Result;
-use crate::journal::{filesystem, parser, reminders, summary, template};
+use crate::journal::{filesystem, git_integrations, parser, reminders, summary, template};
 
 pub struct JournalEntry {
     pub date: NaiveDate,
@@ -31,11 +31,30 @@ impl JournalEntry {
             // Get previous entry's unchecked tasks and "Tomorrow's Focus" content
             let previous_content = Self::get_previous_content(date, config)?;
 
-            // Fetch all reminders (Apple + Google) concurrently
-            let all_reminders = reminders::merge_all_reminders(config).await.unwrap_or(None);
+            // Fetch reminders and git integrations concurrently
+            let reminders_task = reminders::merge_all_reminders(config);
+            let git_integrations_task = git_integrations::merge_git_integrations(config);
 
-            let content =
-                template::apply_variables(&template_content, date, previous_content, all_reminders);
+            let (all_reminders, git_items) =
+                tokio::join!(reminders_task, git_integrations_task);
+
+            let all_reminders = all_reminders.unwrap_or(None);
+            let git_items = git_items.unwrap_or(None);
+
+            // Combine reminders and git integrations into single reminders section
+            let combined_reminders = match (all_reminders, git_items) {
+                (Some(rem), Some(git)) => Some(format!("{}\n\n{}", rem, git)),
+                (Some(rem), None) => Some(rem),
+                (None, Some(git)) => Some(git),
+                (None, None) => None,
+            };
+
+            let content = template::apply_variables(
+                &template_content,
+                date,
+                previous_content,
+                combined_reminders,
+            );
             fs::write(&entry_path, content)?;
 
             // Update SUMMARY.md

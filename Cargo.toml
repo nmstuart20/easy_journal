@@ -19,3 +19,6 @@ serde_json = "1.0"
 # Google Tasks API and OAuth2
 google-tasks1 = "5.0.5"
 yup-oauth2 = "9.0"
+
+# HTTP client (for GitHub and GitLab REST APIs)
+reqwest = { version = "0.12", features = ["json"] }

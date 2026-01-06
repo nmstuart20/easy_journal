@@ -22,6 +22,14 @@ enum Commands {
         /// Specific date (YYYY-MM-DD)
         #[arg(short, long)]
         date: Option<String>,
+
+        /// Include GitHub issues and PRs
+        #[arg(long)]
+        github: bool,
+
+        /// Include GitLab issues and MRs
+        #[arg(long)]
+        gitlab: bool,
     },
     /// Initialize journal structure
     Init,
@@ -37,10 +45,12 @@ enum Commands {
 #[tokio::main]
 async fn main() -> Result<()> {
     let cli = Cli::parse();
-    let config = Config::new();
+    let mut config = Config::new();
 
     match cli.command {
-        Some(Commands::New { date }) => {
+        Some(Commands::New { date, github, gitlab }) => {
+            config.github_config.enabled = github;
+            config.gitlab_config.enabled = gitlab;
             commands::new::run(date, &config).await?;
         }
         Some(Commands::Init) => {

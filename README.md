@@ -49,6 +49,33 @@ easy_journal new
 easy_journal new --date 2025-12-29
 ```
 
+#### Include GitHub Issues and PRs
+```bash
+easy_journal new --github
+```
+
+This will automatically fetch and include:
+- Assigned issues
+- Created issues
+- Assigned pull requests
+- Pull requests where you're requested as reviewer
+
+#### Include GitLab Issues and MRs
+```bash
+easy_journal new --gitlab
+```
+
+This will automatically fetch and include:
+- Assigned issues
+- Created issues
+- Assigned merge requests
+- Merge requests where you're requested as reviewer
+
+#### Use Both GitHub and GitLab
+```bash
+easy_journal new --github --gitlab
+```
+
 #### View Your Journal (with mdbook)
 ```bash
 mdbook serve --open
@@ -62,6 +89,89 @@ easy_journal serve
 ```
 
 This will build and serve your journal at `http://0.0.0.0:3030` with live-reload.
+
+## GitHub and GitLab Integration
+
+Easy Journal can automatically pull your assigned issues, merge requests, and review requests from GitHub and GitLab and add them to your daily entries.
+
+### GitHub Setup
+
+1. Create a personal access token:
+   - Go to GitHub → Settings → Developer settings → Personal access tokens → Tokens (classic)
+   - Generate new token with these scopes:
+     - `repo` (for private repos)
+     - `read:org` (for organization repos)
+   - Or use fine-grained tokens with:
+     - Repository access: Read access to issues and pull requests
+
+2. Set the environment variable:
+   ```bash
+   export GITHUB_TOKEN="your_token_here"
+   ```
+
+3. Use the --github flag when creating entries:
+   ```bash
+   easy_journal new --github
+   ```
+
+### GitLab Setup
+
+1. Create a personal access token:
+   - Go to GitLab → Preferences → Access Tokens
+   - Create token with `read_api` scope
+
+2. Set the environment variables:
+   ```bash
+   export GITLAB_TOKEN="your_token_here"
+   # Optional: for self-hosted GitLab instances
+   export GITLAB_HOST="https://gitlab.example.com"
+   ```
+
+3. Use the --gitlab flag when creating entries:
+   ```bash
+   easy_journal new --gitlab
+   ```
+
+### What Gets Included
+
+When you use --github or --gitlab, your daily entry will automatically include:
+
+- **Assigned Issues**: Issues assigned to you
+- **Created Issues**: Issues you created (even if not assigned to you)
+- **Assigned MRs/PRs**: Merge requests or pull requests assigned to you
+- **Review Requests**: MRs/PRs where you're requested as a reviewer
+
+Each item includes:
+- Title with link
+- Repository/project name
+- Issue/MR number
+- Labels (if any)
+- Due date (if set)
+
+Items are formatted as markdown checkboxes so you can track them in your journal.
+
+### Example Output
+
+```markdown
+## Reminders
+{{reminders}}
+
+### GitHub
+
+#### Review Requests
+- [ ] [owner/repo] Add new feature (#456) [feature] [priority-high]
+      https://github.com/owner/repo/pull/456
+
+#### Assigned Issues
+- [ ] [owner/repo] Fix login bug (#123) [bug] [urgent] - Due: 2026-01-15
+      https://github.com/owner/repo/issues/123
+
+### GitLab
+
+#### Assigned MRs
+- [ ] [group/project] Update documentation (!789) [docs]
+      https://gitlab.com/group/project/-/merge_requests/789
+```
 
 ## Template Customization
 

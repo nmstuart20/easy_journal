@@ -32,6 +32,12 @@ pub enum JournalError {
 
     #[error("Failed to fetch Google Tasks: {0}")]
     GoogleTasksFailed(String),
+
+    #[error("Failed to fetch GitHub items: {0}")]
+    GitHubFailed(String),
+
+    #[error("Failed to fetch GitLab items: {0}")]
+    GitLabFailed(String),
 }
 
 pub type Result<T> = std::result::Result<T, JournalError>;
