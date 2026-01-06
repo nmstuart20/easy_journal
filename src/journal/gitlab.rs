@@ -287,8 +287,8 @@ fn extract_project_from_url(url: &str) -> String {
     // Extract group/project from URL like "https://gitlab.com/group/project/-/issues/123"
     // or "https://gitlab.com/group/subgroup/project/-/merge_requests/456"
     let parts: Vec<&str> = url.split('/').collect();
-    if let Some(dash_idx) = parts.iter().position(|&p| p == "-") {
-        if dash_idx >= 2 {
+    if let Some(dash_idx) = parts.iter().position(|&p| p == "-")
+        && dash_idx >= 2 {
             // Join all parts between the domain and the "/-/" separator
             let start = parts
                 .iter()
@@ -297,7 +297,6 @@ fn extract_project_from_url(url: &str) -> String {
                 .unwrap_or(3);
             return parts[start..dash_idx].join("/");
         }
-    }
     "unknown".to_string()
 }
 
