@@ -253,7 +253,7 @@ async fn fetch_review_requests(
     let response = client
         .get(&url)
         .header("PRIVATE-TOKEN", token)
-        .query(&[("reviewer_id", "me"), ("state", "opened")])
+        .query(&[("scope", "reviews_for_me"), ("state", "opened")])
         .send()
         .await
         .map_err(|e| {
