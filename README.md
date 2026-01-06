@@ -1,4 +1,4 @@
-# Rusty Journal
+# Easy Journal
 
 A an over-engineered command-line journal system that uses Rust mdbook. Create, organize, and browse your daily journal entries.
 
