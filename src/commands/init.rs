@@ -126,11 +126,55 @@ Edit the `template.md` file in the project root to customize your daily entry te
         println!("✓ Created template.md");
     }
 
+    // Create .gitignore if it doesn't exist
+    let gitignore_path = Path::new(".gitignore");
+    if !gitignore_path.exists() {
+        let gitignore_content = r#"/target
+.easy_journal_tokens.json
+.env
+credentials.json
+book/
+"#;
+        fs::write(gitignore_path, gitignore_content)?;
+        println!("✓ Created .gitignore");
+    }
+
+    // Create .env.example if it doesn't exist
+    let env_example_path = Path::new(".env.example");
+    if !env_example_path.exists() {
+        let env_example_content = r#"# Easy Journal Environment Variables
+# Copy this file to .env and fill in your credentials
+# The .env file is already in .gitignore and will not be committed
+
+# Google Tasks OAuth Credentials
+# Get these from: https://console.cloud.google.com/
+GOOGLE_CLIENT_ID=your_google_client_id_here
+GOOGLE_CLIENT_SECRET=your_google_client_secret_here
+
+# GitHub Personal Access Token
+# Create at: https://github.com/settings/tokens
+# Required scopes: repo, read:org (or use fine-grained tokens with read access to issues/PRs)
+GITHUB_TOKEN=ghp_your_github_token_here
+
+# GitLab Personal Access Token
+# Create at: https://gitlab.com/-/user_settings/personal_access_tokens
+# Required scope: read_api
+GITLAB_TOKEN=glpat-your_gitlab_token_here
+
+# GitLab Host (optional - defaults to https://gitlab.com)
+# For self-hosted GitLab instances:
+# GITLAB_HOST=https://gitlab.example.com
+"#;
+        fs::write(env_example_path, env_example_content)?;
+        println!("✓ Created .env.example");
+    }
+
     println!("\n🎉 Journal repository initialized successfully!");
     println!("\nNext steps:");
-    println!("  1. Run 'easy_journal' to create your first entry");
-    println!("  2. Run 'mdbook serve' to view your journal in a browser");
-    println!("  3. Customize 'template.md' to personalize your daily entries");
+    println!("  1. Copy .env.example to .env and add your API tokens (optional)");
+    println!("  2. Run 'easy_journal' to create your first entry");
+    println!("  3. Run 'mdbook serve' to view your journal in a browser");
+    println!("  4. Customize 'template.md' to personalize your daily entries");
 
     Ok(())
 }

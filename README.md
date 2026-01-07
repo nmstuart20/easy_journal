@@ -32,6 +32,8 @@ The `init` command automatically creates everything you need:
 - `book.toml` - mdbook configuration
 - `journal/` directory with README.md and SUMMARY.md
 - `template.md` - customizable daily entry template
+- `.gitignore` - prevents committing tokens and build artifacts
+- `.env.example` - template for your API tokens and credentials
 
 ### Usage
 
@@ -96,7 +98,7 @@ Easy Journal can automatically pull your assigned issues, merge requests, and re
 
 ### Quick Setup with .env File (Recommended)
 
-The easiest way to manage your API tokens is using a `.env` file:
+The easiest way to manage your API tokens is using a `.env` file. If you used `easy_journal init`, the `.env.example` file is already created for you!
 
 1. Copy the example file:
    ```bash
