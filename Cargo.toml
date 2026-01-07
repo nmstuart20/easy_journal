@@ -22,3 +22,6 @@ yup-oauth2 = "9.0"
 
 # HTTP client (for GitHub and GitLab REST APIs)
 reqwest = { version = "0.12", features = ["json"] }
+
+# Environment variable management
+dotenvy = "0.15"

@@ -94,6 +94,35 @@ This will build and serve your journal at `http://0.0.0.0:3030` with live-reload
 
 Easy Journal can automatically pull your assigned issues, merge requests, and review requests from GitHub and GitLab and add them to your daily entries.
 
+### Quick Setup with .env File (Recommended)
+
+The easiest way to manage your API tokens is using a `.env` file:
+
+1. Copy the example file:
+   ```bash
+   cp .env.example .env
+   ```
+
+2. Edit `.env` and add your tokens:
+   ```bash
+   # GitHub
+   GITHUB_TOKEN=ghp_your_token_here
+
+   # GitLab
+   GITLAB_TOKEN=glpat-your_token_here
+
+   # Google Tasks (optional)
+   GOOGLE_CLIENT_ID=your_client_id
+   GOOGLE_CLIENT_SECRET=your_client_secret
+   ```
+
+3. The `.env` file is already in `.gitignore` and won't be committed
+
+4. Use the flags when creating entries:
+   ```bash
+   easy_journal new --github --gitlab
+   ```
+
 ### GitHub Setup
 
 1. Create a personal access token:
@@ -104,7 +133,12 @@ Easy Journal can automatically pull your assigned issues, merge requests, and re
    - Or use fine-grained tokens with:
      - Repository access: Read access to issues and pull requests
 
-2. Set the environment variable:
+2. Add to `.env` file (recommended):
+   ```bash
+   GITHUB_TOKEN=ghp_your_token_here
+   ```
+
+   Or set as environment variable:
    ```bash
    export GITHUB_TOKEN="your_token_here"
    ```
@@ -120,10 +154,16 @@ Easy Journal can automatically pull your assigned issues, merge requests, and re
    - Go to GitLab → Preferences → Access Tokens
    - Create token with `read_api` scope
 
-2. Set the environment variables:
+2. Add to `.env` file (recommended):
+   ```bash
+   GITLAB_TOKEN=glpat-your_token_here
+   # Optional: for self-hosted GitLab instances
+   GITLAB_HOST=https://gitlab.example.com
+   ```
+
+   Or set as environment variables:
    ```bash
    export GITLAB_TOKEN="your_token_here"
-   # Optional: for self-hosted GitLab instances
    export GITLAB_HOST="https://gitlab.example.com"
    ```
 

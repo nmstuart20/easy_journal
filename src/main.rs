@@ -44,6 +44,9 @@ enum Commands {
 
 #[tokio::main]
 async fn main() -> Result<()> {
+    // Load .env file if it exists (ignore errors if file doesn't exist)
+    let _ = dotenvy::dotenv();
+
     let cli = Cli::parse();
     let mut config = Config::new();
 
