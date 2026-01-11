@@ -18,8 +18,9 @@ impl JournalEntry {
 
         // Ensure year and month directories exist
         filesystem::ensure_year_dir(year, &config.journal_dir)?;
+        filesystem::create_year_readme(year, &config.journal_dir, config)?;
         filesystem::ensure_month_dir(year, month, &config.journal_dir)?;
-        filesystem::create_month_readme(year, month, &config.journal_dir)?;
+        filesystem::create_month_readme(year, month, &config.journal_dir, config)?;
 
         // Get entry path
         let entry_path = filesystem::get_entry_path(date, &config.journal_dir);

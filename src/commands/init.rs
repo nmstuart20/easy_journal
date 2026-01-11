@@ -126,6 +126,98 @@ Edit the `template.md` file in the project root to customize your daily entry te
         println!("✓ Created template.md");
     }
 
+    // Create month_template.md if it doesn't exist
+    if !config.month_template_path.exists() {
+        let month_template_content = r#"# {{month}} {{year}}
+
+## Goals for this month
+- [ ]
+- [ ]
+- [ ]
+
+## Key Projects & Focus Areas
+
+### Project 1
+
+
+### Project 2
+
+
+## Reflections & Learnings
+
+
+## Highlights & Accomplishments
+
+
+---
+
+**Month Started**:
+**Month Rating (1-10)**:
+"#;
+        fs::write(&config.month_template_path, month_template_content)?;
+        println!("✓ Created month_template.md");
+    }
+
+    // Create year_template.md if it doesn't exist
+    if !config.year_template_path.exists() {
+        let year_template_content = r#"# Year in Review: {{year}}
+
+## Goals for the Year
+
+### Professional Goals
+- [ ]
+- [ ]
+- [ ]
+
+### Personal Goals
+- [ ]
+- [ ]
+- [ ]
+
+### Health & Wellness Goals
+- [ ]
+- [ ]
+
+## Themes or Focus Areas
+
+### Theme 1:
+
+
+### Theme 2:
+
+
+### Theme 3:
+
+
+## Highlights & Accomplishments
+
+### Q1 (Jan-Mar)
+
+
+### Q2 (Apr-Jun)
+
+
+### Q3 (Jul-Sep)
+
+
+### Q4 (Oct-Dec)
+
+
+## Challenges & Growth
+
+
+## Lessons Learned
+
+
+---
+
+**Year Started**:
+**Overall Year Rating (1-10)**:
+"#;
+        fs::write(&config.year_template_path, year_template_content)?;
+        println!("✓ Created year_template.md");
+    }
+
     // Create .gitignore if it doesn't exist
     let gitignore_path = Path::new(".gitignore");
     if !gitignore_path.exists() {
@@ -175,6 +267,8 @@ GITLAB_TOKEN=glpat-your_gitlab_token_here
     println!("  2. Run 'easy_journal' to create your first entry");
     println!("  3. Run 'mdbook serve' to view your journal in a browser");
     println!("  4. Customize 'template.md' to personalize your daily entries");
+    println!("  5. Customize 'month_template.md' for monthly reviews");
+    println!("  6. Customize 'year_template.md' for yearly reviews");
 
     Ok(())
 }

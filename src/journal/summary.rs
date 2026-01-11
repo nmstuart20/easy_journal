@@ -49,12 +49,21 @@ impl Summary {
                 continue;
             }
 
-            // Parse year headers (e.g., "# 2025")
-            if let Some(year_str) = trimmed.strip_prefix("# ")
-                && let Ok(year) = year_str.parse::<u32>()
-            {
-                nodes.push(SummaryNode::YearHeader(year));
-                continue;
+            // Parse year headers - both plain and linked formats
+            // "# 2025" or "# [2025](2025/README.md)"
+            if let Some(year_str) = trimmed.strip_prefix("# ") {
+                // Handle linked format: # [2025](2025/README.md)
+                if let Some((year_label, _)) = parse_year_entry(year_str)
+                    && let Ok(year) = year_label.parse::<u32>()
+                {
+                    nodes.push(SummaryNode::YearHeader(year));
+                    continue;
+                }
+                // Handle plain format: # 2025
+                if let Ok(year) = year_str.parse::<u32>() {
+                    nodes.push(SummaryNode::YearHeader(year));
+                    continue;
+                }
             }
 
             // Parse day entries (e.g., "  - [29 - Sunday](2025/12/29.md)")
@@ -291,7 +300,8 @@ impl Summary {
                     if !in_user_content {
                         content.push('\n');
                     }
-                    content.push_str(&format!("# {}\n", year));
+                    // Render as clickable link to year README
+                    content.push_str(&format!("# [{}]({}/README.md)\n", year, year));
                 }
                 SummaryNode::MonthEntry {
                     year,
@@ -346,6 +356,20 @@ fn parse_day_entry(line: &str) -> Option<(String, String)> {
     } else {
         None
     }
+}
+
+fn parse_year_entry(line: &str) -> Option<(String, String)> {
+    // Parse "[2025](2025/README.md)"
+    if line.starts_with('[') {
+        let line = line.trim_start_matches('[');
+        let parts: Vec<&str> = line.split("](").collect();
+        if parts.len() == 2 {
+            let year_label = parts[0].to_string();
+            let path = parts[1].trim_end_matches(')').to_string();
+            return Some((year_label, path));
+        }
+    }
+    None
 }
 
 fn extract_year_month_from_path(path: &str) -> Option<(u32, u32)> {

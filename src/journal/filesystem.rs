@@ -2,7 +2,9 @@ use chrono::NaiveDate;
 use std::fs;
 use std::path::{Path, PathBuf};
 
+use crate::config::Config;
 use crate::error::Result;
+use crate::journal::template;
 
 pub fn ensure_year_dir(year: u32, base_path: &Path) -> Result<PathBuf> {
     let year_path = base_path.join(year.to_string());
@@ -18,7 +20,7 @@ pub fn ensure_month_dir(year: u32, month: u32, base_path: &Path) -> Result<PathB
     Ok(month_path)
 }
 
-pub fn create_month_readme(year: u32, month: u32, base_path: &Path) -> Result<()> {
+pub fn create_month_readme(year: u32, month: u32, base_path: &Path, config: &Config) -> Result<()> {
     let month_path = base_path
         .join(year.to_string())
         .join(format!("{:02}", month));
@@ -29,32 +31,29 @@ pub fn create_month_readme(year: u32, month: u32, base_path: &Path) -> Result<()
         return Ok(());
     }
 
-    let month_name = get_month_name(month);
-    let content = format!(
-        "# {} {}\n\n## Goals for this month \n - [ ] \n\n---\n\n",
-        month_name, year
-    );
+    // Load and apply month template
+    let template_content = template::load_month_template(&config.month_template_path)?;
+    let content = template::apply_month_variables(&template_content, year, month);
 
     fs::write(readme_path, content)?;
     Ok(())
 }
 
-fn get_month_name(month: u32) -> &'static str {
-    match month {
-        1 => "January",
-        2 => "February",
-        3 => "March",
-        4 => "April",
-        5 => "May",
-        6 => "June",
-        7 => "July",
-        8 => "August",
-        9 => "September",
-        10 => "October",
-        11 => "November",
-        12 => "December",
-        _ => "Unknown",
+pub fn create_year_readme(year: u32, base_path: &Path, config: &Config) -> Result<()> {
+    let year_path = base_path.join(year.to_string());
+    let readme_path = year_path.join("README.md");
+
+    // Don't overwrite existing README
+    if readme_path.exists() {
+        return Ok(());
     }
+
+    // Load and apply year template
+    let template_content = template::load_year_template(&config.year_template_path)?;
+    let content = template::apply_year_variables(&template_content, year);
+
+    fs::write(readme_path, content)?;
+    Ok(())
 }
 
 pub fn get_entry_path(date: NaiveDate, base_path: &Path) -> PathBuf {
@@ -68,12 +67,6 @@ pub fn get_entry_path(date: NaiveDate, base_path: &Path) -> PathBuf {
 #[cfg(test)]
 mod tests {
     use super::*;
-
-    #[test]
-    fn test_get_month_name() {
-        assert_eq!(get_month_name(1), "January");
-        assert_eq!(get_month_name(12), "December");
-    }
 
     #[test]
     fn test_get_entry_path() {

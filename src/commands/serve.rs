@@ -640,6 +640,16 @@ async fn create_entry(
             .into_response();
     }
 
+    if let Err(e) = filesystem::create_year_readme(year, &state.config.journal_dir, &state.config) {
+        return (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            Json(ErrorResponse {
+                error: format!("Failed to create year README: {}", e),
+            }),
+        )
+            .into_response();
+    }
+
     if let Err(e) = filesystem::ensure_month_dir(year, month, &state.config.journal_dir) {
         return (
             StatusCode::INTERNAL_SERVER_ERROR,
@@ -650,7 +660,9 @@ async fn create_entry(
             .into_response();
     }
 
-    if let Err(e) = filesystem::create_month_readme(year, month, &state.config.journal_dir) {
+    if let Err(e) =
+        filesystem::create_month_readme(year, month, &state.config.journal_dir, &state.config)
+    {
         return (
             StatusCode::INTERNAL_SERVER_ERROR,
             Json(ErrorResponse {

@@ -5,6 +5,8 @@ use std::path::PathBuf;
 pub struct Config {
     pub journal_dir: PathBuf,
     pub template_path: PathBuf,
+    pub month_template_path: PathBuf,
+    pub year_template_path: PathBuf,
     pub google_oauth: GoogleOAuthConfig,
     pub github_config: GitHubConfig,
     pub gitlab_config: GitLabConfig,
@@ -38,6 +40,8 @@ impl Default for Config {
         Self {
             journal_dir: PathBuf::from("journal"),
             template_path: PathBuf::from("template.md"),
+            month_template_path: PathBuf::from("month_template.md"),
+            year_template_path: PathBuf::from("year_template.md"),
             google_oauth: GoogleOAuthConfig {
                 client_id: env::var("GOOGLE_CLIENT_ID").ok(),
                 client_secret: env::var("GOOGLE_CLIENT_SECRET").ok(),

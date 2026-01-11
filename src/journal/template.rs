@@ -44,11 +44,109 @@ const DEFAULT_TEMPLATE: &str = r#"# {{date}} - {{day_of_week}}
 **Hours Worked**:
 "#;
 
+const DEFAULT_MONTH_TEMPLATE: &str = r#"# {{month}} {{year}}
+
+## Goals for this month
+- [ ]
+- [ ]
+- [ ]
+
+## Key Projects & Focus Areas
+
+### Project 1
+
+
+### Project 2
+
+
+## Reflections & Learnings
+
+
+## Highlights & Accomplishments
+
+
+---
+
+**Month Started**:
+**Month Rating (1-10)**:
+"#;
+
+const DEFAULT_YEAR_TEMPLATE: &str = r#"# Year in Review: {{year}}
+
+## Goals for the Year
+
+### Professional Goals
+- [ ]
+- [ ]
+- [ ]
+
+### Personal Goals
+- [ ]
+- [ ]
+- [ ]
+
+### Health & Wellness Goals
+- [ ]
+- [ ]
+
+## Themes or Focus Areas
+
+### Theme 1:
+
+
+### Theme 2:
+
+
+### Theme 3:
+
+
+## Highlights & Accomplishments
+
+### Q1 (Jan-Mar)
+
+
+### Q2 (Apr-Jun)
+
+
+### Q3 (Jul-Sep)
+
+
+### Q4 (Oct-Dec)
+
+
+## Challenges & Growth
+
+
+## Lessons Learned
+
+
+---
+
+**Year Started**:
+**Overall Year Rating (1-10)**:
+"#;
+
 pub fn load_template(template_path: &Path) -> Result<String> {
     if template_path.exists() {
         fs::read_to_string(template_path).map_err(JournalError::Io)
     } else {
         Ok(DEFAULT_TEMPLATE.to_string())
+    }
+}
+
+pub fn load_month_template(template_path: &Path) -> Result<String> {
+    if template_path.exists() {
+        fs::read_to_string(template_path).map_err(JournalError::Io)
+    } else {
+        Ok(DEFAULT_MONTH_TEMPLATE.to_string())
+    }
+}
+
+pub fn load_year_template(template_path: &Path) -> Result<String> {
+    if template_path.exists() {
+        fs::read_to_string(template_path).map_err(JournalError::Io)
+    } else {
+        Ok(DEFAULT_YEAR_TEMPLATE.to_string())
     }
 }
 
@@ -153,6 +251,41 @@ fn convert_to_checkboxes(content: &str) -> String {
         .join("\n")
 }
 
+pub fn apply_month_variables(template: &str, year: u32, month: u32) -> String {
+    let month_name = get_month_name(month);
+    let date_str = format!("{}-{:02}", year, month);
+
+    template
+        .replace("{{year}}", &year.to_string())
+        .replace("{{month}}", month_name)
+        .replace("{{month_num}}", &format!("{:02}", month))
+        .replace("{{date}}", &date_str)
+}
+
+pub fn apply_year_variables(template: &str, year: u32) -> String {
+    template
+        .replace("{{year}}", &year.to_string())
+        .replace("{{date}}", &year.to_string())
+}
+
+fn get_month_name(month: u32) -> &'static str {
+    match month {
+        1 => "January",
+        2 => "February",
+        3 => "March",
+        4 => "April",
+        5 => "May",
+        6 => "June",
+        7 => "July",
+        8 => "August",
+        9 => "September",
+        10 => "October",
+        11 => "November",
+        12 => "December",
+        _ => "Unknown",
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -210,5 +343,47 @@ mod tests {
         assert!(result.contains("- [ ] Already a checkbox"));
         // Make sure we didn't double-add checkboxes
         assert!(!result.contains("- [ ] - [ ]"));
+    }
+
+    #[test]
+    fn test_apply_month_variables() {
+        let template = "# {{month}} {{year}} - {{month_num}}\n{{date}}";
+        let result = apply_month_variables(template, 2025, 12);
+        assert!(result.contains("December"));
+        assert!(result.contains("2025"));
+        assert!(result.contains("12"));
+        assert!(result.contains("2025-12"));
+    }
+
+    #[test]
+    fn test_apply_year_variables() {
+        let template = "# Year {{year}} Review\n{{date}}";
+        let result = apply_year_variables(template, 2025);
+        assert!(result.contains("2025"));
+        assert_eq!(result.lines().count(), 2);
+    }
+
+    #[test]
+    fn test_get_month_name() {
+        assert_eq!(get_month_name(1), "January");
+        assert_eq!(get_month_name(6), "June");
+        assert_eq!(get_month_name(12), "December");
+        assert_eq!(get_month_name(13), "Unknown");
+    }
+
+    #[test]
+    fn test_load_month_template_default() {
+        // Test that default template is returned when file doesn't exist
+        let result = load_month_template(Path::new("nonexistent_month_template.md")).unwrap();
+        assert!(result.contains("{{month}} {{year}}"));
+        assert!(result.contains("Goals for this month"));
+    }
+
+    #[test]
+    fn test_load_year_template_default() {
+        // Test that default template is returned when file doesn't exist
+        let result = load_year_template(Path::new("nonexistent_year_template.md")).unwrap();
+        assert!(result.contains("Year in Review: {{year}}"));
+        assert!(result.contains("Goals for the Year"));
     }
 }
